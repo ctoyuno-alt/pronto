@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pronto-cron-notify
+  namespace: pronto
+  labels:
+    app.kubernetes.io/name: pronto-cron-notify
+spec:
+  schedule: "*/15 * * * *" # Runs every 15 minutes
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: cron-runner
+              image: curlimages/curl:8.5.0
+              command:
+                - sh
+                - -c
+                - |
+                  curl -s -f "http://pronto-app:3000/api/cron/notify?secret=$CRON_SECRET" || exit 1
+              env:
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: pronto-secrets
+                      key: CRON_SECRET

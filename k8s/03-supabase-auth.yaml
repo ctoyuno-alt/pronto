@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pronto-auth
+  namespace: pronto
+  labels:
+    app.kubernetes.io/name: pronto-auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pronto-auth
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: pronto-auth
+    spec:
+      containers:
+        - name: gotrue
+          image: supabase/gotrue:v2.161.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9999
+              name: http
+          env:
+            - name: GOTRUE_API_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: GOTRUE_API_HOST
+            - name: GOTRUE_API_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: GOTRUE_API_PORT
+            - name: GOTRUE_API_EXTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: GOTRUE_API_EXTERNAL_URL
+            - name: API_EXTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: API_EXTERNAL_URL
+            - name: GOTRUE_DB_DRIVER
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: GOTRUE_DB_DRIVER
+            - name: GOTRUE_DB_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: pronto-secrets
+                  key: GOTRUE_DB_DATABASE_URL
+            - name: GOTRUE_SITE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: GOTRUE_SITE_URL
+            - name: GOTRUE_URI_ALLOW_LIST
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: GOTRUE_URI_ALLOW_LIST
+            - name: GOTRUE_DISABLE_SIGNUP
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: GOTRUE_DISABLE_SIGNUP
+            - name: GOTRUE_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: pronto-secrets
+                  key: GOTRUE_JWT_SECRET
+            - name: GOTRUE_JWT_EXP
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: GOTRUE_JWT_EXP
+            - name: GOTRUE_JWT_ALGO
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: GOTRUE_JWT_ALGO
+            - name: GOTRUE_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: GOTRUE_LOG_LEVEL
+            - name: GOTRUE_MAILER_AUTOCONFIRM
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: GOTRUE_MAILER_AUTOCONFIRM
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9999
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 9999
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pronto-auth
+  namespace: pronto
+  labels:
+    app.kubernetes.io/name: pronto-auth
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9999
+      targetPort: 9999
+      name: http
+  selector:
+    app.kubernetes.io/name: pronto-auth

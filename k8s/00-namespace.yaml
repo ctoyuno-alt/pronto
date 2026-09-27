@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pronto
+  labels:
+    app.kubernetes.io/name: pronto
+    app.kubernetes.io/part-of: pronto-system

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pronto-registry
+  namespace: pronto
+  labels:
+    app.kubernetes.io/name: pronto-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pronto-registry
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: pronto-registry
+    spec:
+      containers:
+        - name: registry
+          image: registry:2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+              name: http
+          env:
+            - name: REGISTRY_HTTP_ADDR
+              value: "0.0.0.0:5000"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pronto-registry
+  namespace: pronto
+  labels:
+    app.kubernetes.io/name: pronto-registry
+spec:
+  type: NodePort
+  ports:
+    - port: 5000
+      targetPort: 5000
+      nodePort: 30500
+      name: http
+  selector:
+    app.kubernetes.io/name: pronto-registry

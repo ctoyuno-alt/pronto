@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM mirror.gcr.io/library/node:20-alpine AS base
 
 # ── Install app deps ───────────────────────────────
 FROM base AS deps

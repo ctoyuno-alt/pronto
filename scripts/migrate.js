@@ -103,15 +103,15 @@ async function main() {
   try {
     // Ensure the tracking table exists and is not exposed via PostgREST
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS schema_migrations (
+      CREATE TABLE IF NOT EXISTS app_schema_migrations (
         filename   TEXT        PRIMARY KEY,
         applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `)
-    await pool.query(`ALTER TABLE schema_migrations ENABLE ROW LEVEL SECURITY`)
+    await pool.query(`ALTER TABLE app_schema_migrations ENABLE ROW LEVEL SECURITY`)
 
     // Fetch already-applied migrations
-    const { rows } = await pool.query('SELECT filename FROM schema_migrations ORDER BY filename')
+    const { rows } = await pool.query('SELECT filename FROM app_schema_migrations ORDER BY filename')
     const applied   = new Set(rows.map(r => r.filename))
 
     // Read migration files sorted by name (001 → 018 …)
@@ -140,7 +140,7 @@ async function main() {
       try {
         await pool.query(sql)
         await pool.query(
-          'INSERT INTO schema_migrations (filename) VALUES ($1) ON CONFLICT DO NOTHING',
+          'INSERT INTO app_schema_migrations (filename) VALUES ($1) ON CONFLICT DO NOTHING',
           [file],
         )
         console.log('done')
@@ -156,7 +156,7 @@ async function main() {
         } else if (msg.includes('already exists')) {
           // Migration was previously applied manually — record it and continue
           await pool.query(
-            'INSERT INTO schema_migrations (filename) VALUES ($1) ON CONFLICT DO NOTHING',
+            'INSERT INTO app_schema_migrations (filename) VALUES ($1) ON CONFLICT DO NOTHING',
             [file],
           )
           console.log('skipped (already applied)')

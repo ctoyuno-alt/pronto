@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pronto-app
+  namespace: pronto
+  labels:
+    app.kubernetes.io/name: pronto-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pronto-app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: pronto-app
+    spec:
+      containers:
+        - name: pronto-app
+          image: 127.0.0.1:30500/pronto-app:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: NODE_ENV
+            - name: NEXT_PUBLIC_DEPLOYMENT_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: NEXT_PUBLIC_DEPLOYMENT_MODE
+            - name: NEXT_PUBLIC_APP_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: NEXT_PUBLIC_APP_URL
+            - name: NEXT_PUBLIC_SITE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: NEXT_PUBLIC_SITE_URL
+            - name: NEXT_PUBLIC_SUPABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: NEXT_PUBLIC_SUPABASE_URL
+            - name: NEXT_PUBLIC_SUPABASE_ANON_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pronto-secrets
+                  key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+            - name: SUPABASE_SERVICE_ROLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pronto-secrets
+                  key: SUPABASE_SERVICE_ROLE_KEY
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: pronto-secrets
+                  key: DATABASE_URL
+            - name: CRON_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: pronto-secrets
+                  key: CRON_SECRET
+            - name: INTERNAL_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: pronto-secrets
+                  key: INTERNAL_API_SECRET
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pronto-app
+  namespace: pronto
+  labels:
+    app.kubernetes.io/name: pronto-app
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+      name: http
+  selector:
+    app.kubernetes.io/name: pronto-app

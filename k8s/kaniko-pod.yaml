@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pronto-kaniko
+  namespace: pronto
+spec:
+  restartPolicy: Never
+  volumes:
+    - name: workspace
+      emptyDir: {}
+  initContainers:
+    - name: helper
+      image: busybox:1.36
+      command: ["sh", "-c", "until [ -f /workspace/ready ]; do sleep 1; done; echo Source ready!"]
+      volumeMounts:
+        - name: workspace
+          mountPath: /workspace
+  containers:
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:v1.23.0-debug
+      args:
+        - "--context=dir:///workspace/src"
+        - "--dockerfile=/workspace/src/Dockerfile"
+        - "--destination=pronto-registry:5000/pronto-app:v1"
+        - "--insecure"
+        - "--insecure-pull"
+        - "--skip-tls-verify"
+      volumeMounts:
+        - name: workspace
+          mountPath: /workspace
