@@ -16,6 +16,8 @@ RUN npm install --production
 # ── Build ─────────────────────────────────────────
 FROM base AS builder
 WORKDIR /app
+ENV NEXT_FONT_GOOGLE_MOCKED=1
+ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build

@@ -22,7 +22,7 @@ spec:
                 - sh
                 - -c
                 - |
-                  curl -s -f "http://pronto-app:3000/api/cron/notify?secret=$CRON_SECRET" || exit 1
+                  curl -s -f -H "Authorization: Bearer $CRON_SECRET" "http://pronto-app:3000/api/cron/notify" || exit 1
               env:
                 - name: CRON_SECRET
                   valueFrom:

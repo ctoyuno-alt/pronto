@@ -24,7 +24,7 @@ spec:
       containers:
         - name: migrate
           image: 127.0.0.1:30500/pronto-app:v1
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           command: ["node", "/app/scripts/migrate.js"]
           env:
             - name: NODE_ENV

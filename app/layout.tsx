@@ -9,7 +9,7 @@ import './globals.css'
 // unavailable (see RootLayout below).
 const FALLBACK_MESSAGES = enMessages as Awaited<ReturnType<typeof getMessages>>
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], fallback: ['system-ui', 'sans-serif'], adjustFontFallback: false })
 
 export const metadata: Metadata = {
   title: 'Pronto — Business Management for Service SMBs',

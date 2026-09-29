@@ -10,12 +10,16 @@ const bricolage = Bricolage_Grotesque({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
   variable: '--font-bricolage',
+  fallback: ['system-ui', 'sans-serif'],
+  adjustFontFallback: false,
 })
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500'],
   variable: '--font-dm-sans',
+  fallback: ['system-ui', 'sans-serif'],
+  adjustFontFallback: false,
 })
 
 export const metadata: Metadata = {

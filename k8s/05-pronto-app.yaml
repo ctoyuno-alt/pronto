@@ -18,7 +18,7 @@ spec:
       containers:
         - name: pronto-app
           image: 127.0.0.1:30500/pronto-app:v1
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
               name: http

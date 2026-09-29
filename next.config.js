@@ -59,6 +59,15 @@ const nextConfig = {
       { protocol: 'https', hostname: '*.r2.cloudflarestorage.com' },
     ],
   },
+  async rewrites() {
+    const authTarget = process.env.GOTRUE_INTERNAL_URL || 'http://pronto-auth:9999'
+    return [
+      {
+        source: '/auth/v1/:path*',
+        destination: `${authTarget}/:path*`,
+      },
+    ]
+  },
   async redirects() {
     const domain = process.env.APP_DOMAIN
     if (!domain) return []
