@@ -33,11 +33,6 @@ spec:
                 configMapKeyRef:
                   name: pronto-config
                   key: GOTRUE_API_PORT
-            - name: GOTRUE_API_PREFIX
-              valueFrom:
-                configMapKeyRef:
-                  name: pronto-config
-                  key: GOTRUE_API_PREFIX
             - name: GOTRUE_API_EXTERNAL_URL
               valueFrom:
                 configMapKeyRef:
