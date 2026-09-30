@@ -61,10 +61,15 @@ const nextConfig = {
   },
   async rewrites() {
     const authTarget = process.env.GOTRUE_INTERNAL_URL || 'http://pronto-auth:9999'
+    const restTarget = process.env.POSTGREST_INTERNAL_URL || 'http://pronto-rest:3000'
     return [
       {
         source: '/auth/v1/:path*',
         destination: `${authTarget}/:path*`,
+      },
+      {
+        source: '/rest/v1/:path*',
+        destination: `${restTarget}/:path*`,
       },
     ]
   },

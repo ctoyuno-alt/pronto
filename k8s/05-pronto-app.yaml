@@ -48,6 +48,11 @@ spec:
                 configMapKeyRef:
                   name: pronto-config
                   key: NEXT_PUBLIC_SUPABASE_URL
+            - name: INTERNAL_SUPABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pronto-config
+                  key: INTERNAL_SUPABASE_URL
             - name: NEXT_PUBLIC_SUPABASE_ANON_KEY
               valueFrom:
                 secretKeyRef:

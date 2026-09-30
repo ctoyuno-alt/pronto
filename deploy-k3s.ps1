@@ -92,10 +92,12 @@ kubectl apply -f "$ScriptDir/k8s/02-postgres.yaml"
 Write-Host "Waiting for PostgreSQL pod to start..." -ForegroundColor Gray
 kubectl rollout status statefulset/pronto-postgres -n $Namespace --timeout=120s
 
-# 5. Deploy Supabase Auth (GoTrue)
-Write-Host "Deploying Supabase Auth (GoTrue)..." -ForegroundColor Yellow
+# 5. Deploy Supabase Auth (GoTrue) & PostgREST
+Write-Host "Deploying Supabase Auth (GoTrue) & PostgREST..." -ForegroundColor Yellow
 kubectl apply -f "$ScriptDir/k8s/03-supabase-auth.yaml"
 kubectl rollout status deployment/pronto-auth -n $Namespace --timeout=120s
+kubectl apply -f "$ScriptDir/k8s/03.5-postgrest.yaml"
+kubectl rollout status deployment/pronto-rest -n $Namespace --timeout=120s
 
 # 6. Run Database Migrations Job
 Write-Host "Running database migration job..." -ForegroundColor Yellow

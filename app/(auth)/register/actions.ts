@@ -33,8 +33,9 @@ export async function register(formData: FormData) {
 
   // Используем service role чтобы создать бизнес сразу,
   // не дожидаясь подтверждения email (обходим RLS)
+  const supabaseUrl = process.env.INTERNAL_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!
   const admin = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    supabaseUrl,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 

@@ -80,9 +80,11 @@ kubectl apply -f "$SCRIPT_DIR/k8s/02-postgres.yaml"
 echo "⏳ Waiting for PostgreSQL to be ready..."
 kubectl rollout status statefulset/pronto-postgres -n "$NAMESPACE" --timeout=120s
 
-echo "🔑 Deploying Supabase Auth (GoTrue)..."
+echo "🔑 Deploying Supabase Auth (GoTrue) & PostgREST..."
 kubectl apply -f "$SCRIPT_DIR/k8s/03-supabase-auth.yaml"
 kubectl rollout status deployment/pronto-auth -n "$NAMESPACE" --timeout=120s
+kubectl apply -f "$SCRIPT_DIR/k8s/03.5-postgrest.yaml"
+kubectl rollout status deployment/pronto-rest -n "$NAMESPACE" --timeout=120s
 
 # 6. Apply Migration Job
 echo "🔄 Running database migration job..."

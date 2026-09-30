@@ -17,9 +17,10 @@ function cookieDomain(): string | undefined {
 export async function createClient() {
   const cookieStore = await cookies()
   const domain = cookieDomain()
+  const supabaseUrl = process.env.INTERNAL_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!
 
   return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    supabaseUrl,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {

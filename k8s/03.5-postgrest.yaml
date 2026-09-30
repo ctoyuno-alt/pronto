@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pronto-rest
+  namespace: pronto
+  labels:
+    app.kubernetes.io/name: pronto-rest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pronto-rest
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: pronto-rest
+    spec:
+      containers:
+        - name: postgrest
+          image: postgrest/postgrest:v12.2.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: PGRST_DB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: pronto-secrets
+                  key: DATABASE_URL
+            - name: PGRST_DB_SCHEMAS
+              value: "public"
+            - name: PGRST_DB_EXTRA_SEARCH_PATH
+              value: "auth,public,extensions"
+            - name: PGRST_DB_ANON_ROLE
+              value: "anon"
+            - name: PGRST_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: pronto-secrets
+                  key: GOTRUE_JWT_SECRET
+            - name: PGRST_SERVER_PORT
+              value: "3000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pronto-rest
+  namespace: pronto
+  labels:
+    app.kubernetes.io/name: pronto-rest
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+      name: http
+  selector:
+    app.kubernetes.io/name: pronto-rest
